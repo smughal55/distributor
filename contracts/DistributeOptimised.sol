@@ -13,14 +13,11 @@ contract DistributeOptimised {
     function distribute() external {
         require(block.timestamp > createTime + 2 weeks, "cannot call distribute yet");
         uint256 amount;
+        bool success;
         assembly {
             amount := div(selfbalance(), 6)
+            for { let i := 0 } lt(i, 6) { i := add(i, 1) } { success := call(gas(), sload(i), amount, 0, 0, 0, 0) }
         }
-        payable(contributors[0]).transfer(amount);
-        payable(contributors[1]).transfer(amount);
-        payable(contributors[2]).transfer(amount);
-        payable(contributors[3]).transfer(amount);
-        payable(contributors[4]).transfer(amount);
-        payable(contributors[5]).transfer(amount);
+        require(success, "Failed to send ETH");
     }
 }
